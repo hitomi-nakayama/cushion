@@ -1,0 +1,13 @@
+#######################################
+# Create a new SSH Agent and add in the credentials in ~/.ssh
+# Arguments:
+#   None
+#######################################
+function agt() {
+  eval "$(ssh-agent -s)"
+
+  # using find because nullglobs are difficult to make combatible with both
+  # zsh and bash
+  find ~/.ssh -maxdepth 1 -name '*_rsa' -o -name '*_ed25519' \
+    | xargs -o -I '{}' -- ssh-add '{}'
+}
