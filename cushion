@@ -11,6 +11,12 @@ export EDITOR="${VISUAL}"
 
 export TERM_CMD="$(which kitty)"
 
+# ======== Helper Functions ========
+
+function error() {
+  echo "$*" >&2
+}
+
 
 # ======== Directory Navigation ========
 
@@ -43,15 +49,41 @@ function mvlnrs() {
     cplnrs "${@:1}" && rm "${@:1:-1}"
 }
 
-# create a par2 file with 5% redundancy
+#######################################
+# Create a par2 file
+# Globals:
+#   OPTIND
+# Arguments:
+#   -r<n> set the redundancy level (5% by default)
+#   Files/directories to open
+#######################################
 function p2() {
-    local dir_name
-    if [[ -d "$1" ]]; then
-        dir_name="$(basename -- "$1")"
-        par2create -r5 -R "${dir_name}.par2" "$1"
+  local dir_name
+  local redundancy
+
+  redundancy=5
+
+  OPTIND=1  # Reset in case getopts has been used previously in the shell
+  while getopts 'r:' flag; do
+    case "${flag}" in
+      r) redundancy="${OPTARG}" ;;
+      *) error "Unexpected option ${flag}" ;;
+    esac
+  done
+  shift $(( OPTIND - 1 ))
+
+  if [[ "${1:-}" == '--' ]]; then
+    shift
+  fi
+
+  for f in "$@"; do
+    if [[ -d "${f}" ]]; then
+      dir_name="$(basename -- "${f}")"
+      par2create "-r${redundancy}" -R "${dir_name}.par2" "${f}"
     else
-        par2create -r5 "$1"
+      par2create "-r${redundancy}" "${f}"
     fi
+  done
 }
 
 # Compress a file into tar.xz. This results in better compression than using
@@ -67,6 +99,16 @@ alias uidmt="sudo mount -o uid=$(id -u),gid=$(id -g)"
 
 # display images in kitty terminal
 alias icat="kitty +kitten icat"
+
+#######################################
+# Open a file with its default program
+# Arguments:
+#   file to open
+#######################################
+function o() {
+  xdg-open "$1" &
+  disown
+}
 
 # open a new terminal at the current directory
 function s() {
