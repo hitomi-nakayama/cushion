@@ -131,8 +131,8 @@ function esync() {
   if (( now_time - sync_time < 86400 )); then
     echo "You last synced less than 24 hours ago on ${timestamp}."
   else
-    # if it's been over 5 days, then first get a snapshot.
-    if (( now_time - sync_time > 432000 )); then
+    # if it's been 2 or more days, then first get a snapshot.
+    if (( now_time - sync_time > 172800 )); then
         sudo emerge-webrsync
     fi
     sudo emerge --sync
