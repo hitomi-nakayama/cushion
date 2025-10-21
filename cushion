@@ -112,7 +112,8 @@ function o() {
 
 # open a new terminal at the current directory
 function s() {
-  "${TERM_CMD}" "$(pwd)" </dev/null &>/dev/null &; disown
+  "${TERM_CMD}" "$(pwd)" </dev/null &>/dev/null &
+  disown
 }
 
 #######################################
