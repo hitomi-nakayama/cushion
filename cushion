@@ -1,3 +1,100 @@
+# ======== Environment Variables ========
+# set our VISUAL variable in order of perefence
+export VISUAL="$(which nvim || which vim || which nano)"
+
+which nvim > /dev/null
+if (( $? != 0 )); then
+    USING_NVIM='true'
+fi
+
+export EDITOR="${VISUAL}"
+
+export TERM_CMD="$(which kitty)"
+
+
+# ======== Directory Navigation ========
+
+alias dv="dirs -v"
+
+if which eza &> /dev/null; then
+    alias l='eza --icons'
+else
+    alias l='ls --color=auto'
+fi
+
+if which eza &> /dev/null; then
+    alias ll='eza --oneline --icons --long --group --time-style=long-iso'
+else
+    alias ll='ls -l -h --time-style="+%Y-%m-%d %H:%M" --color=auto'
+fi
+
+# ======== File System Manipulation ========
+
+# Symbolic link manipulation
+# move a relative symbolic link
+function cplnrs() {
+    for f in "${@:1:-1}"; do
+        ln -rs "$(readlink -f "${f}")" "${@[-1]}"
+    done
+}
+
+# move a relative symbolic link
+function mvlnrs() {
+    cplnrs "${@:1}" && rm "${@:1:-1}"
+}
+
+# create a par2 file with 5% redundancy
+function p2() {
+    local dir_name
+    if [[ -d "$1" ]]; then
+        dir_name="$(basename -- "$1")"
+        par2create -r5 -R "${dir_name}.par2" "$1"
+    else
+        par2create -r5 "$1"
+    fi
+}
+
+# Compress a file into tar.xz. This results in better compression than using
+# the ordinary tar utility.
+function txz() {
+    tar -cv "$1" | xz -9e > "$(basename "$1").tar.xz"
+}
+
+alias uidmt="sudo mount -o uid=$(id -u),gid=$(id -g)"
+
+
+# ======== Launching Programs ========
+
+# display images in kitty terminal
+alias icat="kitty +kitten icat"
+
+# open a new terminal at the current directory
+function s() {
+  "${TERM_CMD}" "$(pwd)" </dev/null &>/dev/null &; disown
+}
+
+#######################################
+# Open an editor with a list of files to open
+# Globals:
+#   USING_NVIM
+#   VISUAL
+# Arguments:
+#   Files to open
+#######################################
+function v() {
+  local flags
+  declare -a flags
+
+  if [[ "${USING_NVIM}" == 'true' ]]; then
+    # open files in tabs.
+    flags+=('-p')
+  fi
+
+  "${VISUAL}" "${flags[@]}" "$@"
+}
+
+
+# ======== Networking ========
 
 # Alias ssh so that kitty can send the proper terminfo.
 if [[ "${TERM}" == 'xterm-kitty' ]]; then
@@ -17,3 +114,30 @@ function agt() {
   find ~/.ssh -maxdepth 1 -name '*_rsa' -o -name '*_ed25519' \
     | xargs -o -I '{}' -- ssh-add '{}'
 }
+
+
+# ======== Package Management ========
+
+# gentoo package management
+function esync() {
+  local timestamp
+  local sync_time
+  local now_time
+
+  timestamp="$(cat $(portageq get_repo_path / gentoo)/metadata/timestamp.chk)"
+  sync_time="$(date -d "${timestamp}" '+%s')"
+  now_time="$(date '+%s')"
+
+  if (( now_time - sync_time < 86400 )); then
+    echo "You last synced less than 24 hours ago on ${timestamp}."
+  else
+    # if it's been over 5 days, then first get a snapshot.
+    if (( now_time - sync_time > 432000 )); then
+        sudo emerge-webrsync
+    fi
+    sudo emerge --sync
+  fi
+}
+
+alias eupdate="sudo emerge --ask --quiet --update --deep --newuse @world"
+alias epurge="sudo emerge --ask --depclean && sudo eclean --deep distfiles && sudo eclean --deep packages"
