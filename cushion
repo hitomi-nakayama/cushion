@@ -1,3 +1,9 @@
+
+# Alias ssh so that kitty can send the proper terminfo.
+if [[ "${TERM}" == 'xterm-kitty' ]]; then
+  alias ssh='kitty +kitten ssh'
+fi
+
 #######################################
 # Create a new SSH Agent and add in the credentials in ~/.ssh
 # Arguments:
