@@ -1,9 +1,13 @@
 # ======== Environment Variables ========
+
+# Get the name of the shell we're in right now.
+CURRENT_SHELL="$(ps -cp "$$" -o command='')"
+
 # set our VISUAL variable in order of perefence
 export VISUAL="$(which nvim || which vim || which nano)"
 
 which nvim > /dev/null
-if (( $? != 0 )); then
+if (( $? == 0 )); then
     USING_NVIM='true'
 fi
 
@@ -11,12 +15,41 @@ export EDITOR="${VISUAL}"
 
 export TERM_CMD="$(which kitty)"
 
+
 # ======== Helper Functions ========
 
 function error() {
   echo "$*" >&2
 }
 
+
+# ======== Shell Configuration ========
+
+
+
+case "${CURRENT_SHELL}" in
+  zsh)
+    PS1='%3. %# '
+    ;;
+  bash)
+    ;;
+  *) error "Unknown shell '${CURRENT_SHELL}'"
+esac
+
+# ---- History ----
+# disable software flow control
+# (make Ctrl+S not pause the terminal)
+stty -ixon
+
+case "${CURRENT_SHELL}" in
+  zsh)
+    bindkey '^R' history-incremental-pattern-search-backward
+    bindkey '^S' history-incremental-pattern-search-forward
+    ;;
+  bash)
+    ;;
+  *) error "Unknown shell '${CURRENT_SHELL}'"
+esac
 
 # ======== Directory Navigation ========
 
