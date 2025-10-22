@@ -1,13 +1,12 @@
 # ======== Environment Variables ========
 
 # Get the name of the shell we're in right now.
-CURRENT_SHELL="$(ps -cp "$$" -o command='')"
+CUSH_SHELL="$(ps -cp "$$" -o command='')"
 
 # set our VISUAL variable in order of perefence
 export VISUAL="$(which nvim || which vim || which nano)"
 
-which nvim > /dev/null
-if (( $? == 0 )); then
+if which nvim >/dev/null; then
     USING_NVIM='true'
 fi
 
@@ -15,7 +14,10 @@ export EDITOR="${VISUAL}"
 
 export TERM_CMD="$(which kitty)"
 
-
+# Check if we're in a remote session
+if pstree -s -p $$ | grep -c '\-sshd(' >/dev/null; then
+  CUSH_REMOTE='true'
+fi
 # ======== Helper Functions ========
 
 function error() {
@@ -25,30 +27,103 @@ function error() {
 
 # ======== Shell Configuration ========
 
+#######################################
+# Create the path part of the shell prompt.
+# Truncates the path components to shorten long paths.
+# Globals:
+#   HOME
+# Arguments:
+#   -r<n> set the redundancy level (5% by default)
+#   Files/directories to open
+#######################################
+function cushion_prompt_path() {
+  echo "${PWD}" | awk -v HOME="${HOME}" -f <(cat - << '  EOF'
+    BEGIN {
+      FS = "\n"  # one field per line
+      OFS = "/"
+      before_ellipsis = 2
+      after_ellipsis = 2
+    }
+    {
+      path = $0
+
+      if (index(path, HOME) == 1) {
+        # replace home path with ~
+        path = "~" substr(path, length(HOME) + 1)
+      }
+
+      num_parts = split(path, path_parts, "/")
+
+      first = 1
+      for (i = 1; i <= num_parts; i++) {
+        if (first) {
+          first = 0
+        } else {
+          printf "%s", OFS
+        }
+
+        if (i > before_ellipsis && i < num_parts - after_ellipsis + 1) {
+          # replace truncated section with ellipses
+          i = num_parts - after_ellipsis
+          printf "…"
+          continue
+        }
+
+        printf "%s", path_parts[i]
+      }
+     printf "\n"
+    }
+  EOF
+  )
+}
+
+function cush_set_ps1() {
+  local path_part
+  local remote_part
+  local shell_symbol
+
+  case "${CUSH_SHELL}" in
+    zsh)
+      setopt PROMPT_SUBST
+      ;;
+    bash)
+      shopt -s promptvars
+      ;;
+  esac
 
 
-case "${CURRENT_SHELL}" in
-  zsh)
-    PS1='%3. %# '
-    ;;
-  bash)
-    ;;
-  *) error "Unknown shell '${CURRENT_SHELL}'"
-esac
+  if [[ CUSH_REMOTE == 'true' ]]; then
+    case "${CUSH_SHELL}" in
+      zsh) remote_part='%M:' ;;
+      bash) remote_part='\H:' ;;
+    esac
+  else
+    remote_part=''
+  fi
+
+  case "${CUSH_SHELL}" in
+    zsh) shell_symbol='%#' ;;
+    bash) shell_symbol='\$' ;;
+  esac
+
+  PS1="${remote_part}"'$(cushion_prompt_path)'"${shell_symbol} "
+}
+cush_set_ps1
+
 
 # ---- History ----
 # disable software flow control
 # (make Ctrl+S not pause the terminal)
 stty -ixon
 
-case "${CURRENT_SHELL}" in
+case "${CUSH_SHELL}" in
   zsh)
     bindkey '^R' history-incremental-pattern-search-backward
     bindkey '^S' history-incremental-pattern-search-forward
     ;;
   bash)
     ;;
-  *) error "Unknown shell '${CURRENT_SHELL}'"
+  *) error "Unknown shell '${CUSH_SHELL}'"
 esac
 
 # ======== Directory Navigation ========
