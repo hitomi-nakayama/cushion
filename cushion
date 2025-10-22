@@ -103,8 +103,8 @@ function cush_set_ps1() {
 
   if [[ "${CUSH_REMOTE}" == 'true' ]]; then
     case "${CUSH_SHELL}" in
-      zsh) remote_part='%M:' ;;
-      bash) remote_part='\H:' ;;
+      zsh) remote_part='%n@%M:' ;;
+      bash) remote_part='\u@\H:' ;;
     esac
   else
     remote_part=''
