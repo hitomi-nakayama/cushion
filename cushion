@@ -104,10 +104,14 @@ function cush_git_prompt() {
   git status -s | awk -f "${CUSH_DIR}/git_prompt_status.awk"
 
   commits_behind="$(git rev-list --right-only --count HEAD...@{upstream})"
-  printf "⇣${commits_behind}"
+  if (( commits_behind != 0 )); then
+    printf "⇣${commits_behind}"
+  fi
 
   commits_ahead="$(git rev-list --left-only --count HEAD...@{upstream})"
-  printf "⇡${commits_ahead}"
+  if (( commits_ahead != 0 )); then
+    printf "⇡${commits_ahead}"
+  fi
 
   printf '}\n'
 
