@@ -3,6 +3,13 @@
 # Get the name of the shell we're in right now.
 CUSH_SHELL="$(ps -cp "$$" -o command='')"
 
+case "${CUSH_SHELL}" in
+  zsh) CUSH_SCRIPT="$0" ;;
+  bash) CUSH_SCRIPT="${BASH_SOURCE[0]}" ;;
+esac
+CUSH_DIR="$(realpath "$(dirname "$CUSH_SCRIPT")")"
+
+
 # set our VISUAL variable in order of perefence
 export VISUAL="$(which nvim || which vim || which nano)"
 
@@ -18,6 +25,8 @@ export TERM_CMD="$(which kitty)"
 if pstree -s -p $$ | grep -c '\-sshd(' >/dev/null; then
   CUSH_REMOTE='true'
 fi
+
+
 # ======== Helper Functions ========
 
 function error() {
@@ -77,6 +86,25 @@ function cushion_prompt_path() {
   )
 }
 
+function cush_git_prompt() {
+  local current_branch
+  local status_symbols
+
+  if ! git 'status' &>/dev/null; then
+    return 1  # not inside of git repo
+  fi
+
+  printf '{'
+
+  current_branch="$(git branch --show-current)"
+  printf "${current_branch}"
+
+  git status -s | awk -f "${CUSH_DIR}/git_prompt_status.awk"
+
+  printf '}\n'
+
+}
+
 #######################################
 # Set the shell prompt
 # Globals:
@@ -115,7 +143,7 @@ function cush_set_ps1() {
     bash) shell_symbol='\$' ;;
   esac
 
-  PS1="${remote_part}"'$(cushion_prompt_path)'"${shell_symbol} "
+  PS1="${remote_part}"'$(cushion_prompt_path)$(cush_git_prompt)'"${shell_symbol} "
 }
 cush_set_ps1
 
