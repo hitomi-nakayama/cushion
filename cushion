@@ -89,6 +89,8 @@ function cushion_prompt_path() {
 function cush_git_prompt() {
   local current_branch
   local status_symbols
+  local commits_behind
+  local commits_ahead
 
   if ! git 'status' &>/dev/null; then
     return 1  # not inside of git repo
@@ -100,6 +102,12 @@ function cush_git_prompt() {
   printf "${current_branch}"
 
   git status -s | awk -f "${CUSH_DIR}/git_prompt_status.awk"
+
+  commits_behind="$(git rev-list --right-only --count HEAD...@{upstream})"
+  printf "⇣${commits_behind}"
+
+  commits_ahead="$(git rev-list --left-only --count HEAD...@{upstream})"
+  printf "⇡${commits_ahead}"
 
   printf '}\n'
 
