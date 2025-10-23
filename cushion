@@ -153,7 +153,17 @@ fi
 
 # ======== File System Manipulation ========
 
-# Symbolic link manipulation
+#######################################
+# Create a directory and `cd` into it.
+# Arguments:
+#   Directories to create
+#   The last provided directory will be `cd`'d into.
+#######################################
+function mkcd() {
+  mkdir -p "$@" && cd "${@:$#}"
+}
+
+# ---- Symbolic Links ----
 # move a relative symbolic link
 function cplnrs() {
     for f in "${@:1:-1}"; do
@@ -165,6 +175,7 @@ function cplnrs() {
 function mvlnrs() {
     cplnrs "${@:1}" && rm "${@:1:-1}"
 }
+
 
 #######################################
 # Create a par2 file
@@ -253,6 +264,16 @@ function v() {
   "${VISUAL}" "${flags[@]}" "$@"
 }
 
+# ======== git ========
+
+alias g='git'
+alias gc='git commit'
+alias gcam='git commit -am'
+alias gcb='git checkout -b'
+alias gco='git checkout'
+alias gd='git diff'
+alias gp='git push'
+alias gst='git status'
 
 # ======== Networking ========
 
