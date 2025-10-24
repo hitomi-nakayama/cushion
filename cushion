@@ -103,12 +103,12 @@ function cush_git_prompt() {
 
   git status -s | awk -f "${CUSH_DIR}/git_prompt_status.awk"
 
-  commits_behind="$(git rev-list --right-only --count HEAD...@{upstream})"
+  commits_behind="$(git rev-list --right-only --count HEAD...@{upstream} 2>/dev/null||echo '0')"
   if (( commits_behind != 0 )); then
     printf "⇣${commits_behind}"
   fi
 
-  commits_ahead="$(git rev-list --left-only --count HEAD...@{upstream})"
+  commits_ahead="$(git rev-list --left-only --count HEAD...@{upstream} 2>/dev/null ||echo '0')"
   if (( commits_ahead != 0 )); then
     printf "⇡${commits_ahead}"
   fi
@@ -161,6 +161,20 @@ cush_set_ps1
 
 
 # ---- History ----
+# Enble history
+case "${CUSH_SHELL}" in
+  zsh)
+    setopt HIST_EXPIRE_DUPS_FIRST
+    setopt SHARE_HISTORY
+    SAVEHIST=1000
+    HISTSIZE=$(( SAVEHIST + 100 ))
+    HISTFILE=~/.zsh_history
+    ;;
+  bash)
+    ;;
+esac
+
+
 # disable software flow control
 # (make Ctrl+S not pause the terminal)
 stty -ixon
@@ -172,8 +186,8 @@ case "${CUSH_SHELL}" in
     ;;
   bash)
     ;;
-  *) error "Unknown shell '${CUSH_SHELL}'"
 esac
+
 
 # ======== Directory Navigation ========
 
