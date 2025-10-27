@@ -36,6 +36,19 @@ function error() {
 
 # ======== Shell Configuration ========
 
+# ---- Hotkeys ----
+# Home and End Keys
+case "${CUSH_SHELL}" in
+  zsh)
+    bindkey '^[[H' beginning-of-line
+    bindkey '^[[F' end-of-line
+    ;;
+  bash)
+    bind '\e[[H':beginning-of-line
+    bind '\e[[F':end-of-line
+    ;;
+esac
+
 #######################################
 # Create the path part of the shell prompt.
 # Truncates the path components to shorten long paths.
