@@ -117,7 +117,7 @@ function cush_git_prompt() {
   current_branch="$(git branch --show-current)"
   printf "${current_branch}"
 
-  echo "${status_short}" | awk -f "${CUSH_DIR}/git_prompt_status.awk"
+  echo -n "${status_short}" | awk -f "${CUSH_DIR}/git_prompt_status.awk"
 
   commits_behind="$(git rev-list --right-only --count HEAD...@{upstream} 2>/dev/null||echo '0')"
   if (( commits_behind != 0 )); then
