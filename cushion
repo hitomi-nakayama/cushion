@@ -44,8 +44,8 @@ case "${CUSH_SHELL}" in
     bindkey '^[[F' end-of-line
     ;;
   bash)
-    bind '\e[[H':beginning-of-line
-    bind '\e[[F':end-of-line
+    bind '"\e[H":beginning-of-line'
+    bind '"\e[F":end-of-line'
     ;;
 esac
 
