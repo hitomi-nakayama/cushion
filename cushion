@@ -65,7 +65,6 @@ function cushion_prompt_path() {
 function cush_git_prompt() {
   local current_branch
   local status_short
-  local status_symbols
   local commits_behind
   local commits_ahead
 
