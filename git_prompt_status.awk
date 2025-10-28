@@ -1,15 +1,13 @@
 BEGIN {
-    FS = ""  # split by char
+    FS = " "
     count_mod = 0
     count_untracked = 0
 }
-{
-    if ($1 == "?") {
-        count_untracked += 1
-    } else {
-        count_mod += 1
-    }
-
+$1 == "?" {
+    count_untracked += 1
+}
+$1 == "1" || $1 == "2" || $1 == "3" {
+    count_mod += 1
 }
 END {
     if (count_mod) {

@@ -69,16 +69,24 @@ function cush_git_prompt() {
   local commits_behind
   local commits_ahead
 
-  status_short="$(git status -s 2>/dev/null)"
-
+  status_short="$(git status --porcelain=2 --branch 2>/dev/null)"
   if (( $? != 0 )); then
     return 1  # not inside of git repo
   fi
 
   printf '{'
 
-  current_branch="$(git branch --show-current)"
-  printf "${current_branch}"
+  # try go get branch name
+  current_checkout="$(git symbolic-ref --short -q HEAD)"
+  if (( $? != 0 )); then
+    # try to get tag name
+    current_checkout="🏷️$(git describe --exact-match 2>/dev/null)"
+    if (( $? != 0 )); then
+      # get abbreviated commit ID
+      current_checkout="📑$(git rev-parse --short HEAD)"
+    fi
+  fi
+  printf "${current_checkout}"
 
   echo -n "${status_short}" | awk -f "${CUSH_DIR}/git_prompt_status.awk"
 
