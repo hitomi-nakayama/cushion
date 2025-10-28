@@ -82,7 +82,7 @@ function cush_git_prompt() {
     current_checkout="🏷️$(git describe --exact-match 2>/dev/null)"
     if (( $? != 0 )); then
       # get abbreviated commit ID
-      current_checkout="📑$(git rev-parse --short HEAD)"
+      current_checkout="📃$(git rev-parse --short HEAD)"
     fi
   fi
   printf "${current_checkout}"
