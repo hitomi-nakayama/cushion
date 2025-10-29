@@ -145,15 +145,17 @@ esac
 
 
 # ---- Cursor ----
-# Home and End Keys
+# Moving the cursor
 case "${CUSH_SHELL}" in
   zsh)
-    bindkey '^[[H' beginning-of-line
-    bindkey '^[[F' end-of-line
+    bindkey '^[[H' beginning-of-line  # Home
+    bindkey '^[[F' end-of-line  # End
+    bindkey '^[[1;5D' vi-backward-blank-word  # Ctrl+Left
+    bindkey '^[[1;5C' vi-forward-blank-word  # Ctrl+Right
     ;;
   bash)
-    bind '"\e[H":beginning-of-line'
-    bind '"\e[F":end-of-line'
+    bind '"\e[H":beginning-of-line'  # Home
+    bind '"\e[F":end-of-line'  # End
     ;;
 esac
 
@@ -162,6 +164,7 @@ case "${CUSH_SHELL}" in
   zsh)
     bindkey '^[[3~' delete-char  # Del
     bindkey '^H' backward-kill-word  # Ctrl+Backspace
+    bindkey '^[[3;5~' kill-word  # Ctrl+Del
     ;;
   bash)
     ;;
