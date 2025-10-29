@@ -36,28 +36,7 @@ function error() {
 
 # ======== Shell Configuration ========
 
-# ---- Hotkeys ----
-# Home and End Keys
-case "${CUSH_SHELL}" in
-  zsh)
-    bindkey '^[[H' beginning-of-line
-    bindkey '^[[F' end-of-line
-    ;;
-  bash)
-    bind '"\e[H":beginning-of-line'
-    bind '"\e[F":end-of-line'
-    ;;
-esac
-
-# Deleting Text
-case "${CUSH_SHELL}" in
-  zsh)
-    bindkey '^[[3~' delete-char
-    ;;
-  bash)
-    ;;
-esac
-
+# ---- PS1 Prompt ----
 #######################################
 # Create the path part of the shell prompt.
 # Truncates the path components to shorten long paths.
@@ -153,6 +132,40 @@ function cush_set_ps1() {
   PS1="${remote_part}"'$(cushion_prompt_path)$(cush_git_prompt)'"${shell_symbol} "
 }
 cush_set_ps1
+
+
+# ---- Remove unwanted default keybinds ----
+case "${CUSH_SHELL}" in
+  zsh)
+    bindkey -r '^['  # escape sequence introducer
+    ;;
+  bash)
+    ;;
+esac
+
+
+# ---- Cursor ----
+# Home and End Keys
+case "${CUSH_SHELL}" in
+  zsh)
+    bindkey '^[[H' beginning-of-line
+    bindkey '^[[F' end-of-line
+    ;;
+  bash)
+    bind '"\e[H":beginning-of-line'
+    bind '"\e[F":end-of-line'
+    ;;
+esac
+
+# Deleting Text
+case "${CUSH_SHELL}" in
+  zsh)
+    bindkey '^[[3~' delete-char  # Del
+    bindkey '^H' backward-kill-word  # Ctrl+Backspace
+    ;;
+  bash)
+    ;;
+esac
 
 
 # ---- History ----
