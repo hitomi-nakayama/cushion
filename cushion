@@ -49,6 +49,15 @@ case "${CUSH_SHELL}" in
     ;;
 esac
 
+# Delete key
+case "${CUSH_SHELL}" in
+  zsh)
+    bindkey '^[[3-' delete-char
+    ;;
+  bash)
+    ;;
+esac
+
 #######################################
 # Create the path part of the shell prompt.
 # Truncates the path components to shorten long paths.
