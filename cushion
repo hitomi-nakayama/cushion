@@ -49,10 +49,10 @@ case "${CUSH_SHELL}" in
     ;;
 esac
 
-# Delete key
+# Deleting Text
 case "${CUSH_SHELL}" in
   zsh)
-    bindkey '^[[3-' delete-char
+    bindkey '^[[3~' delete-char
     ;;
   bash)
     ;;
