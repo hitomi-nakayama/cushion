@@ -339,6 +339,11 @@ alias gco='git checkout'
 alias gd='git diff'
 alias gl='git pull'
 alias gp='git push'
+
+function gpsup() {
+  git push --set-upstream origin "$(git_current_branch)" "$@"
+}
+
 alias gst='git status'
 
 # ======== Networking ========
