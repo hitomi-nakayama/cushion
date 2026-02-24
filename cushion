@@ -26,12 +26,21 @@ if pstree -s -p $$ | grep -c '\-sshd(' >/dev/null; then
   CUSH_REMOTE='true'
 fi
 
-
 # ======== Helper Functions ========
 
 function error() {
   echo "$*" >&2
 }
+
+# Get the Parent PID based on PID
+function cush_ppid() {
+    ps --no-headers -o 'ppid' "$1" | tr -d ' '
+}
+
+
+# ======== Terminal Configuration ========
+
+CUSH_TERM_PID="$(cush_ppid "$$")"
 
 
 # ======== Shell Configuration ========
