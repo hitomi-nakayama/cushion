@@ -186,7 +186,7 @@ case "${CUSH_SHELL}" in
   zsh)
     setopt HIST_EXPIRE_DUPS_FIRST
     setopt SHARE_HISTORY
-    SAVEHIST=1000
+    SAVEHIST=2000
     HISTSIZE=$(( SAVEHIST + 100 ))
     HISTFILE=~/.zsh_history
     ;;
