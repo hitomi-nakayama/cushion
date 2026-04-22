@@ -319,6 +319,16 @@ function s() {
 }
 
 #######################################
+# Start the tailscale service
+#######################################
+function tsc() {
+  sudo tailscale up
+  # toggle DNS because it doesn't always work when starting tailscale
+  sudo tailscale set --accept-dns=false
+  sudo tailscale set --accept-dns=true
+}
+
+#######################################
 # Open an editor with a list of files to open
 # Globals:
 #   USING_NVIM
