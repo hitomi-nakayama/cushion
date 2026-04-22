@@ -26,12 +26,21 @@ if pstree -s -p $$ | grep -c '\-sshd(' >/dev/null; then
   CUSH_REMOTE='true'
 fi
 
-
 # ======== Helper Functions ========
 
 function error() {
   echo "$*" >&2
 }
+
+# Get the Parent PID based on PID
+function cush_ppid() {
+    ps --no-headers -o 'ppid' "$1" | tr -d ' '
+}
+
+
+# ======== Terminal Configuration ========
+
+CUSH_TERM_PID="$(cush_ppid "$$")"
 
 
 # ======== Shell Configuration ========
@@ -176,8 +185,9 @@ esac
 case "${CUSH_SHELL}" in
   zsh)
     setopt HIST_EXPIRE_DUPS_FIRST
+    setopt HIST_IGNORE_SPACE
     setopt SHARE_HISTORY
-    SAVEHIST=1000
+    SAVEHIST=2000
     HISTSIZE=$(( SAVEHIST + 100 ))
     HISTFILE=~/.zsh_history
     ;;
@@ -307,6 +317,16 @@ function o() {
 function s() {
   "${TERM_CMD}" "$(pwd)" </dev/null &>/dev/null &
   disown
+}
+
+#######################################
+# Start the tailscale service
+#######################################
+function tsc() {
+  sudo tailscale up
+  # toggle DNS because it doesn't always work when starting tailscale
+  sudo tailscale set --accept-dns=false
+  sudo tailscale set --accept-dns=true
 }
 
 #######################################
