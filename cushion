@@ -10,12 +10,15 @@ esac
 CUSH_DIR="$(realpath "$(dirname "$CUSH_SCRIPT")")"
 
 #######################################
-# Out of a list of programs, return the first one that exists
+# Out of a list of programs, find the first one that exists
 # on the user's computer.
 # Arguments:
 #   a list of programs to search for
+# Globals:
+#   SELECTED_PROGRAM - the program that was selected
+#   SELECTED_PROGRAM_PATH - the path of the selected program
 # Returns:
-#   0 if success
+#   0 if success, otherwise nonzero
 #######################################
 function cush_select_program() {
     local cmd
@@ -23,7 +26,8 @@ function cush_select_program() {
     for cmd in "$@"; do
         cmd_path="$(which "${cmd}")"
         if (( $? == 0 )); then
-            echo "${cmd_path}"
+            SELECTED_PROGRAM="${cmd}"
+            SELECTED_PROGRAM_PATH="${cmd_path}"
             return 0
         fi
     done
@@ -31,9 +35,10 @@ function cush_select_program() {
 }
 
 # set our VISUAL variable in order of perefence
-export VISUAL="$(cush_select_program nvim vim nano vi)"
+cush_select_program nvim vim nano vi
+export VISUAL="${SELECTED_PROGRAM}"
 
-if [[ "$(which nvim)" == "${VISUAL}" ]] ; then
+if [[ "${SELECTED_PROGRAM}" == 'nvim' ]] ; then
     USING_NVIM='true'
 fi
 
