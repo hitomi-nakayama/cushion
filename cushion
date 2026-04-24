@@ -47,11 +47,13 @@ fi
 export EDITOR="${VISUAL}"
 
 cush_select_program kitty
-export TERM_CMD="${SELECTED_PROGRAM}"
+TERM_CMD="${SELECTED_PROGRAM}"
 
 # Check if we're in a remote session
 if pstree -s -p $$ | grep -c '\-sshd(' >/dev/null; then
-  CUSH_REMOTE='true'
+    CUSH_REMOTE='true'
+else
+    CUSH_REMOTE='false'
 fi
 
 # ======== Helper Functions ========
@@ -343,8 +345,12 @@ function o() {
 
 # open a new terminal at the current directory
 function s() {
-  "${TERM_CMD}" "$(pwd)" </dev/null &>/dev/null &
-  disown
+    if [[ "${CUSH_REMOTE}" == 'true' ]]; then
+        echo "Currently inside SSH session. Cannot open another terminal."
+    else
+        "${TERM_CMD}" "$(pwd)" </dev/null &>/dev/null &
+        disown
+    fi
 }
 
 #######################################
