@@ -172,6 +172,51 @@ function cush_set_ps1() {
 }
 cush_set_ps1
 
+# ---- Cursor ----
+case "${CUSH_SHELL}" in
+  zsh)
+    # Moving the cursor
+    bindkey '^[[H' beginning-of-line  # Home
+    bindkey '^[[F' end-of-line  # End
+    bindkey '^[[1;5D' vi-backward-blank-word  # Ctrl+Left
+    bindkey '^[[1;5C' vi-forward-blank-word  # Ctrl+Right
+
+    # Deleting Text
+    bindkey '^[[3~' delete-char  # Del
+    bindkey '^H' backward-kill-word  # Ctrl+Backspace
+    bindkey '^[[3;5~' kill-word  # Ctrl+Del
+    ;;
+  bash)
+    # set line editing mode
+    set -o vi
+
+    # Moving the Cursor
+    bind '"\e[H":beginning-of-line'  # Home
+    bind '"\e[F":end-of-line'  # End
+    ;;
+esac
+
+# ---- History ----
+
+# disable software flow control
+# (make Ctrl+S not pause the terminal)
+stty -ixon
+
+case "${CUSH_SHELL}" in
+  zsh)
+    setopt HIST_EXPIRE_DUPS_FIRST
+    setopt HIST_IGNORE_SPACE
+    setopt SHARE_HISTORY
+    SAVEHIST=2000
+    HISTSIZE=$(( SAVEHIST + 100 ))
+    HISTFILE=~/.zsh_history
+
+    bindkey '^R' history-incremental-pattern-search-backward
+    bindkey '^S' history-incremental-pattern-search-forward
+    ;;
+  bash)
+    ;;
+esac
 
 # ---- Remove unwanted default keybinds ----
 case "${CUSH_SHELL}" in
@@ -181,64 +226,6 @@ case "${CUSH_SHELL}" in
   bash)
     ;;
 esac
-
-
-# ---- Cursor ----
-# Moving the cursor
-case "${CUSH_SHELL}" in
-  zsh)
-    bindkey '^[[H' beginning-of-line  # Home
-    bindkey '^[[F' end-of-line  # End
-    bindkey '^[[1;5D' vi-backward-blank-word  # Ctrl+Left
-    bindkey '^[[1;5C' vi-forward-blank-word  # Ctrl+Right
-    ;;
-  bash)
-    bind '"\e[H":beginning-of-line'  # Home
-    bind '"\e[F":end-of-line'  # End
-    ;;
-esac
-
-# Deleting Text
-case "${CUSH_SHELL}" in
-  zsh)
-    bindkey '^[[3~' delete-char  # Del
-    bindkey '^H' backward-kill-word  # Ctrl+Backspace
-    bindkey '^[[3;5~' kill-word  # Ctrl+Del
-    ;;
-  bash)
-    ;;
-esac
-
-
-# ---- History ----
-# Enble history
-case "${CUSH_SHELL}" in
-  zsh)
-    setopt HIST_EXPIRE_DUPS_FIRST
-    setopt HIST_IGNORE_SPACE
-    setopt SHARE_HISTORY
-    SAVEHIST=2000
-    HISTSIZE=$(( SAVEHIST + 100 ))
-    HISTFILE=~/.zsh_history
-    ;;
-  bash)
-    ;;
-esac
-
-
-# disable software flow control
-# (make Ctrl+S not pause the terminal)
-stty -ixon
-
-case "${CUSH_SHELL}" in
-  zsh)
-    bindkey '^R' history-incremental-pattern-search-backward
-    bindkey '^S' history-incremental-pattern-search-forward
-    ;;
-  bash)
-    ;;
-esac
-
 
 # ======== Directory Navigation ========
 
