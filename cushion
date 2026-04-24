@@ -21,19 +21,19 @@ CUSH_DIR="$(realpath "$(dirname "$CUSH_SCRIPT")")"
 #   0 if success, otherwise nonzero
 #######################################
 function cush_select_program() {
-    local cmd
-    local cmd_path
-    for cmd in "$@"; do
-        cmd_path="$(which "${cmd}" 2>/dev/null)"
-        if (( $? == 0 )); then
-            SELECTED_PROGRAM="${cmd}"
-            SELECTED_PROGRAM_PATH="${cmd_path}"
-            return 0
-        fi
-    done
-    SELECTED_PROGRAM=''
-    SELECTED_PROGRAM_PATH=''
-    return 1
+  local cmd
+  local cmd_path
+  for cmd in "$@"; do
+    cmd_path="$(which "${cmd}" 2>/dev/null)"
+    if (( $? == 0 )); then
+      SELECTED_PROGRAM="${cmd}"
+      SELECTED_PROGRAM_PATH="${cmd_path}"
+      return 0
+    fi
+  done
+  SELECTED_PROGRAM=''
+  SELECTED_PROGRAM_PATH=''
+  return 1
 }
 
 # set our VISUAL variable in order of perefence
@@ -41,7 +41,7 @@ cush_select_program nvim vim nano vi
 export VISUAL="${SELECTED_PROGRAM}"
 
 if [[ "${SELECTED_PROGRAM}" == 'nvim' ]] ; then
-    USING_NVIM='true'
+  USING_NVIM='true'
 fi
 
 export EDITOR="${VISUAL}"
@@ -51,9 +51,9 @@ TERM_CMD="${SELECTED_PROGRAM}"
 
 # Check if we're in a remote session
 if pstree -s -p $$ | grep -c '\-sshd(' >/dev/null; then
-    CUSH_REMOTE='true'
+  CUSH_REMOTE='true'
 else
-    CUSH_REMOTE='false'
+  CUSH_REMOTE='false'
 fi
 
 # ======== Helper Functions ========
@@ -345,12 +345,12 @@ function o() {
 
 # open a new terminal at the current directory
 function s() {
-    if [[ "${CUSH_REMOTE}" == 'true' ]]; then
-        echo "Currently inside SSH session. Cannot open another terminal."
-    else
-        "${TERM_CMD}" "$(pwd)" </dev/null &>/dev/null &
-        disown
-    fi
+  if [[ "${CUSH_REMOTE}" == 'true' ]]; then
+    echo "Currently inside SSH session. Cannot open another terminal."
+  else
+    "${TERM_CMD}" "$(pwd)" </dev/null &>/dev/null &
+    disown
+  fi
 }
 
 #######################################
