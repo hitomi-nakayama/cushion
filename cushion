@@ -31,6 +31,8 @@ function cush_select_program() {
             return 0
         fi
     done
+    SELECTED_PROGRAM=''
+    SELECTED_PROGRAM_PATH=''
     return 1
 }
 
@@ -44,7 +46,8 @@ fi
 
 export EDITOR="${VISUAL}"
 
-export TERM_CMD="$(which kitty)"
+cush_select_program kitty
+export TERM_CMD="${SELECTED_PROGRAM}"
 
 # Check if we're in a remote session
 if pstree -s -p $$ | grep -c '\-sshd(' >/dev/null; then
